@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LevelUp - Productivity Game</title>
+    <link rel="stylesheet" href="/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="light-mode">
+    <div class="app-wrapper">
+        <nav class="navbar">
+            <div class="logo">
+                <i data-lucide="zap"></i> LevelUp
+            </div>
+            <button id="theme-toggle" class="theme-btn" aria-label="Toggle Dark Mode">
+                <i data-lucide="moon" id="moon-icon"></i>
+                <i data-lucide="sun" id="sun-icon" style="display: none;"></i>
+            </button>
+        </nav>
+
+        <main class="container">
+            <!-- Dashboard Section -->
+            <section class="dashboard">
+                <div class="stat-card prime-card">
+                    <h3>Level <span id="current-level">1</span></h3>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" id="level-progress"></div>
+                    </div>
+                    <p class="stat-desc">
+                        <span id="current-points">0</span> / <span id="next-level-points">100</span> pts
+                    </p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>🔥 Streak</h4>
+                        <span class="stat-value" id="streak-count">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <h4>✅ Done</h4>
+                        <span class="stat-value" id="completed-count">0</span>
+                    </div>
+                    <div class="stat-box">
+                        <h4>📋 Total</h4>
+                        <span class="stat-value" id="total-count">0</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Form Section -->
+            <section class="task-form-section">
+                <form id="task-form" class="task-form">
+                    <input type="hidden" id="task-id">
+                    <div class="form-group">
+                        <input type="text" id="task-title" placeholder="What needs to be done?" required autocomplete="off">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <select id="task-difficulty">
+                                <option value="easy">Easy (+10 pts)</option>
+                                <option value="medium" selected>Medium (+20 pts)</option>
+                                <option value="hard">Hard (+50 pts)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <input type="datetime-local" id="task-deadline">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <textarea id="task-desc" placeholder="Notes/Description (optional)" rows="1"></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" id="submit-btn">Add Task</button>
+                    <button type="button" class="btn-secondary" id="cancel-btn">Cancel Edit</button>
+                </form>
+            </section>
+
+            <!-- Tasks Section -->
+            <section class="tasks-section">
+                <div class="tabs">
+                    <button class="tab-btn active" data-filter="pending">Pending</button>
+                    <button class="tab-btn" data-filter="completed">Completed</button>
+                </div>
+                <div class="task-list" id="task-list">
+                    <!-- Dynamic from JS -->
+                </div>
+            </section>
+
+            <footer class="app-footer">
+                <strong>&copy; 2026 LevelUp. All rights strictly reserved.</strong>
+                Designed &amp; Developed by <a href="https://instagram.com/hype_moncef" target="_blank">@hype_moncef</a>
+            </footer>
+
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Scripts -->
+    <!-- Using Lucide via unpkg for vanilla JS icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script type="module" src="/script.js"></script>
+</body>
+</html>

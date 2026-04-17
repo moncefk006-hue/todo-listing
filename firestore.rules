@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() { return request.auth != null; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    
+    // UserStats Validation
+    function isValidUserStats(data) {
+      return data.keys().hasAny(['points', 'level', 'streak', 'createdAt', 'updatedAt'])
+      && data.points is number 
+      && data.level is number 
+      && data.streak is number 
+      && data.createdAt is number 
+      && data.updatedAt is number
+      && ( !data.keys().hasAny(['lastInteraction']) || data.lastInteraction is string );
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() 
+        && request.auth.uid == userId 
+        && isValidId(userId)
+        && isValidUserStats(incoming())
+        && incoming().createdAt == request.time.toMillis()
+        && incoming().keys().size() >= 5
+        && incoming().keys().size() <= 6;
+      allow update: if isSignedIn() 
+        && request.auth.uid == userId 
+        && isValidId(userId)
+        && isValidUserStats(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time.toMillis()
+        && incoming().diff(existing()).affectedKeys().hasOnly(['points', 'level', 'streak', 'lastInteraction', 'updatedAt']);
+    }
+
+    // Task Validation
+    function isValidTask(data) {
+      return data.title is string && data.title.size() <= 200 && data.title.size() > 0
+      && data.difficulty in ['easy', 'medium', 'hard']
+      && data.completed is bool
+      && data.createdAt is number
+      && data.userId == request.auth.uid
+      && (!data.keys().hasAny(['deadline']) || data.deadline is string)
+      && (!data.keys().hasAny(['desc']) || data.desc is string)
+      && (!data.keys().hasAny(['completedAt']) || data.completedAt is number);
+    }
+
+    match /tasks/{taskId} {
+      allow get: if isSignedIn() && existing().userId == request.auth.uid && isValidId(taskId);
+      allow list: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow create: if isSignedIn()
+        && isValidId(taskId)
+        && isValidTask(incoming())
+        && incoming().createdAt == request.time.toMillis()
+        && !incoming().keys().hasAny(['updatedAt'])
+        && incoming().keys().size() >= 5
+        && incoming().keys().size() <= 10;
+        
+      allow update: if isSignedIn()
+        && isValidId(taskId)
+        && existing().userId == request.auth.uid
+        && isValidTask(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().userId == existing().userId
+        && incoming().diff(existing()).affectedKeys().hasAny(['title', 'difficulty', 'deadline', 'desc', 'completed', 'completedAt', 'updatedAt']);
+        
+      allow delete: if isSignedIn() && existing().userId == request.auth.uid && isValidId(taskId);
+    }
+  }
+}

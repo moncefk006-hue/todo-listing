@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "UserStats": {
+      "title": "UserStats",
+      "description": "User gamification statistics",
+      "type": "object",
+      "properties": {
+        "points": { "type": "number", "description": "Current score" },
+        "level": { "type": "number", "description": "Current level" },
+        "streak": { "type": "number", "description": "Current daily streak" },
+        "lastInteraction": { "type": "string", "description": "Last active day string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["points", "level", "streak", "createdAt", "updatedAt"]
+    },
+    "Task": {
+      "title": "Task",
+      "description": "A gamified to-do item",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "difficulty": { "type": "string", "enum": ["easy", "medium", "hard"] },
+        "deadline": { "type": "string" },
+        "desc": { "type": "string" },
+        "completed": { "type": "boolean" },
+        "createdAt": { "type": "number" },
+        "completedAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "userId": { "type": "string", "description": "The ID of the user who owns the task" }
+      },
+      "required": ["title", "difficulty", "completed", "createdAt", "userId"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": { "$ref": "#/entities/UserStats" },
+      "description": "User specific gamification states"
+    },
+    "tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "List of tasks across all users, filtered by userId"
+    }
+  }
+}
